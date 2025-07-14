@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'item_search_delegate.dart';
 import 'package:ecommerce_app/cart.dart';
 import 'package:ecommerce_app/profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ecommerce_app/favorites.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -35,6 +37,7 @@ class _HomepageState extends State<Homepage> {
     fetchItems();
   }
 
+// Fetch items from the API
   void fetchItems() async {
     try {
       final response = await http.get(
@@ -61,24 +64,136 @@ class _HomepageState extends State<Homepage> {
     }
   }
 
+  // Get user ID from SharedPreferences
+  Future<String?> getUserId() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString('userId');
+}
+
+  // Like a product
+  Future<void> likeProduct(String productId, int index) async {
+  final userId = await getUserId();
+
+  if (userId == null) {
+    print("User not logged in");
+    return;
+  }
+
+  final url = Uri.parse('http://10.44.197.181:5000/api/like');
+  final response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'userId': userId, 'productId': productId}),
+  );
+
+  if (response.statusCode == 200) {
+    final result = jsonDecode(response.body);
+    final liked = result['liked'];
+     // Show Snackbar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(liked ? 'Product added to favorites' : 'Product removed from favorites'),
+        backgroundColor: liked ? Colors.green : Colors.red,
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    setState(() {
+      isLikedList[index] = liked;
+    });
+  } else {
+    print('Failed to like product: ${response.body}');
+  }
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        iconSize: 30,
-        selectedItemColor: Color(0xFFFFC727),
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), label: "*"),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_outlined), label: "*"),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: "*"),
-        ],
+     bottomNavigationBar: Container(
+  decoration: BoxDecoration(
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.1),
+        blurRadius: 10,
+        spreadRadius: 1,
       ),
+    ],
+  ),
+  child: ClipRRect(
+    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+    child: BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      currentIndex: _currentIndex,
+      selectedItemColor: const Color(0xFFFFC727),
+      unselectedItemColor: Colors.grey[600],
+      selectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 12,
+        height: 1.5,  // Better vertical spacing
+      ),
+      unselectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 12,
+        height: 1.5,
+      ),
+      iconSize: 26,  // Slightly more compact
+      elevation: 0,  // Remove default elevation
+      backgroundColor: Colors.white,
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      items: [
+        BottomNavigationBarItem(
+          icon: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: const Icon(Icons.home_outlined),
+          ),
+          activeIcon: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: const Icon(Icons.home),
+          ),
+          label: "Home",
+        ),
+        BottomNavigationBarItem(
+          icon: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: const Icon(Icons.shopping_bag_outlined),
+          ),
+          activeIcon: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: const Icon(Icons.shopping_bag),
+          ),
+          label: "Cart",
+        ),
+        BottomNavigationBarItem(
+          icon: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: const Icon(Icons.favorite_border),
+          ),
+          activeIcon: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: const Icon(Icons.favorite),
+          ),
+          label: "Favorites",
+        ),
+        BottomNavigationBarItem(
+          icon: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: const Icon(Icons.person_outline),
+          ),
+          activeIcon: Container(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: const Icon(Icons.person),
+          ),
+          label: "Profile",
+        ),
+      ],
+    ),
+  ),
+),
       body: SafeArea(
         child: _currentIndex == 0
             ? SingleChildScrollView(
@@ -232,11 +347,8 @@ class _HomepageState extends State<Homepage> {
                                                     color: isLiked ? Color(0xFFFFC727) : Colors.grey,
                                                   ),
                                                   onPressed: () {
-                                                    if (index < isLikedList.length) {
-                                                      setState(() {
-                                                        isLikedList[index] = !isLikedList[index];
-                                                      });
-                                                    }
+                                                   final productId = items[index]['_id']; // or item['_id']
+                                                    likeProduct(productId, index);
                                                   },
                                                 ),
                                               ],
@@ -253,10 +365,12 @@ class _HomepageState extends State<Homepage> {
                   ],
                 ),
               )
-            : _currentIndex == 1
-                ? CartPage()
-                : ProfilePage(),
-      ),
-    );
+              : _currentIndex == 1
+              ? CartPage()
+              : _currentIndex == 2
+              ? FavoritesPage()
+              : ProfilePage(),
+          ),
+      );
   }
 }

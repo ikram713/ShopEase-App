@@ -1,37 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:ecommerce_app/homePage.dart';
 import 'package:ecommerce_app/login.dart';
+
 class GetStartedPage extends StatelessWidget {
   const GetStartedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colorScheme.background,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              "images/ecommerceApp.png", // Change to your image path
+              "images/ecommerceApp.png",
               height: 300,
             ),
             const SizedBox(height: 40),
-            const Text(
+            Text(
               "Welcome to ShopEase!",
-              style: TextStyle(
-                fontSize: 24,
+              style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: colorScheme.onBackground,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               "Your smart shopping app. Find, shop, and enjoy!",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onBackground.withOpacity(0.7),
               ),
               textAlign: TextAlign.center,
             ),
@@ -45,6 +48,7 @@ class GetStartedPage extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFFFFC727),
+                foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -53,7 +57,7 @@ class GetStartedPage extends StatelessWidget {
               ),
               child: const Text(
                 "Get Started",
-                style: TextStyle(fontSize: 18, color: Colors.white),
+                style: TextStyle(fontSize: 18),
               ),
             )
           ],
