@@ -4,7 +4,6 @@ Welcome to **ShopEase**, a beautiful and user-friendly mobile shopping app built
 
 Easily browse products, add them to your cart or favorites, and enjoy a clean and responsive shopping experience!
 
----
 
 ## 📱 Features
 
