@@ -31,6 +31,11 @@ Easily browse products, add them to your cart or favorites, and enjoy a clean an
 | Media Upload | Cloudinary ☁️         |
 | State Mgmt   | ValueNotifier 🧠       |
 
+## 📸 App Preview
+
+<img src="https://private-user-images.githubusercontent.com/189795289/466734606-b8b92a7b-62f5-4a7e-b330-106d046e1818.png?jwt=..." alt="ShopEase UI Preview" width="300" />
+
+
 ---
 
 
