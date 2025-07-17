@@ -1,12 +1,12 @@
-import 'package:ecommerce_app/details.dart';
+import 'package:ecommerce_app/presentation/pages/details.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'item_search_delegate.dart';
-import 'package:ecommerce_app/cart.dart';
-import 'package:ecommerce_app/profile.dart';
+import '../widgets/item_search_delegate.dart';
+import 'package:ecommerce_app/presentation/pages/cart.dart';
+import 'package:ecommerce_app/profile/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ecommerce_app/favorites.dart';
+import 'package:ecommerce_app/presentation/pages/favorites.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});

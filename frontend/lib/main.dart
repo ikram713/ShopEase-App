@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ecommerce_app/getStarted.dart';
-import 'package:ecommerce_app/theme_provider.dart'; // <-- Add this line
+import 'package:ecommerce_app/presentation/pages/getStarted.dart';
+import 'package:ecommerce_app/theme/theme_provider.dart'; // <-- Add this line
 
 void main() {
   runApp(MyApp());

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:ecommerce_app/homePage.dart';
+import 'package:ecommerce_app/presentation/pages/homePage.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'details.dart';
+import '../pages/details.dart';
 
 class ItemSearchDelegate extends SearchDelegate {
   Future<List<dynamic>> searchItems(String query) async {

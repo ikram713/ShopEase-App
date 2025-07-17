@@ -5,8 +5,8 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'EditProfilePage.dart';
-import 'package:ecommerce_app/theme_provider.dart';
-import 'login.dart';
+import 'package:ecommerce_app/theme/theme_provider.dart';
+import 'package:ecommerce_app/auth/login.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
