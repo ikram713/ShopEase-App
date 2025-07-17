@@ -15,4 +15,33 @@ router.get('/', async (req, res) => {
     }
 });
 
+
+
+/**
+ * @swagger
+ * /search:
+ *   get:
+ *     summary: Search for items by name
+ *     tags: [Search]
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         schema:
+ *           type: string
+ *         required: false
+ *         description: The search keyword (e.g., shoes)
+ *     responses:
+ *       200:
+ *         description: List of items that match the search
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Item'
+ *       500:
+ *         description: Search failed due to server error
+ */
+
+
 module.exports = router;
