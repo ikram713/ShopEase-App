@@ -29,7 +29,7 @@ Easily browse products, add them to your cart or favorites, and enjoy a clean an
 | Database     | MongoDB 🍃             |
 | Auth         | JWT (token-based) 🔐   |
 | Media Upload | Cloudinary ☁️         |
-| State Mgmt   | ValueNotifier 🧠       |
+    
 
 ## 📸 App Preview
 
