@@ -1,12 +1,11 @@
+import 'package:ecommerce_app/data/services/homePage_service.dart';
 import 'package:ecommerce_app/presentation/pages/details.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../widgets/item_search_delegate.dart';
 import 'package:ecommerce_app/presentation/pages/cart.dart';
-import 'package:ecommerce_app/profile/profile.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ecommerce_app/presentation/profile/profile.dart';
 import 'package:ecommerce_app/presentation/pages/favorites.dart';
+
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -38,58 +37,30 @@ class _HomepageState extends State<Homepage> {
   }
 
 // Fetch items from the API
-  void fetchItems() async {
-    try {
-      final response = await http.get(
-        Uri.parse('http://10.44.197.181:5000/api/items/items'),
-        headers: {'Content-Type': 'application/json'},
-      );
+ 
 
-      if (response.statusCode == 200) {
-        final decodedItems = jsonDecode(response.body);
-        if (mounted) {
-          setState(() {
-            items = decodedItems;
-            isLikedList = List.generate(items.length, (index) => false);
-            isLoading = false;
-          });
-        }
-      } else {
-        print('Failed to load items');
-        if (mounted) setState(() => isLoading = false);
-      }
-    } catch (e) {
-      print('Error: $e');
-      if (mounted) setState(() => isLoading = false);
-    }
+void fetchItems() async {
+  final homePageService = HomePageService();
+  final result = await homePageService.fetchItems();
+  if (mounted) {
+    setState(() {
+      items = result;
+      isLikedList = List.generate(items.length, (_) => false);
+      isLoading = false;
+    });
   }
-
-  // Get user ID from SharedPreferences
-  Future<String?> getUserId() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  return prefs.getString('userId');
 }
 
-  // Like a product
-  Future<void> likeProduct(String productId, int index) async {
-  final userId = await getUserId();
-
+Future<void> likeProduct(String productId, int index) async {
+  final homePageService = HomePageService();
+  final userId = await homePageService.getUserId();
   if (userId == null) {
     print("User not logged in");
     return;
   }
 
-  final url = Uri.parse('http://10.44.197.181:5000/api/like');
-  final response = await http.post(
-    url,
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'userId': userId, 'productId': productId}),
-  );
-
-  if (response.statusCode == 200) {
-    final result = jsonDecode(response.body);
-    final liked = result['liked'];
-     // Show Snackbar
+  final liked = await homePageService.toggleLikeProduct(userId, productId);
+  if (liked != null) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(liked ? 'Product added to favorites' : 'Product removed from favorites'),
@@ -97,12 +68,7 @@ class _HomepageState extends State<Homepage> {
         duration: Duration(seconds: 2),
       ),
     );
-
-    setState(() {
-      isLikedList[index] = liked;
-    });
-  } else {
-    print('Failed to like product: ${response.body}');
+    setState(() => isLikedList[index] = liked);
   }
 }
 

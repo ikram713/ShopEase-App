@@ -32,7 +32,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return;
   }
 
-  final url = Uri.parse("http://10.44.197.181:5000/api/profile/edit");
+  final url = Uri.parse("http://10.93.89.181:5000/api/profile/edit");
 
   try {
     final response = await http.put(

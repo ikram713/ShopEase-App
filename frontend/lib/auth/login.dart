@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:ecommerce_app/presentation/pages/homePage.dart';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ecommerce_app/auth/signup.dart';
+import 'package:ecommerce_app/data/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,51 +14,32 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  void _handleLogin() async {
-    final email = _fullNameController.text.trim();
-    final password = _passwordController.text.trim();
+void _handleLogin() async {
+  final email = _fullNameController.text.trim();
+  final password = _passwordController.text.trim();
 
-    final url = Uri.parse('http://10.44.197.181:5000/api/auth/login');
+  final result = await AuthService.login(email, password);
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final token = data['token'];
-        final userId = data['user']['_id'];
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('authToken', token);
-        await prefs.setString('userId', userId);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login successful!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Homepage()),
-        );
-      } else {
-        final data = jsonDecode(response.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: ${data['message']}')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    }
+  if (result['success']) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Login successful!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const Homepage()),
+    );
+  } else {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Login failed: ${result['message']}')),
+    );
   }
+}
+
 
   @override
   void dispose() {

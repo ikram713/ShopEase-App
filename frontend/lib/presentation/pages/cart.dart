@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/data/services/cart_service.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -20,58 +21,30 @@ class _CartPageState extends State<CartPage> {
     super.initState();
     fetchCart();
   }
-
-  Future<void> fetchCart() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
-
-    if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text("Please login to view your cart"),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-      return;
-    }
-
-    final url = Uri.parse('http://10.44.197.181:5000/api/cart/get');
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'userId': userId}),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          cartItems = data['cart'];
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to load cart');
-      }
-    } catch (e) {
-      print("Error: $e");
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text("Failed to load cart"),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
-    }
+Future<void> fetchCart() async {
+  try {
+    final items = await CartService.fetchCartItems();
+    setState(() {
+      cartItems = items;
+      isLoading = false;
+    });
+  } catch (e) {
+    print("Error: $e");
+    setState(() => isLoading = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text("Failed to load cart"),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
   }
+}
+
+String calculateTotal() {
+  return CartService.calculateTotal(cartItems).toStringAsFixed(2);
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -411,12 +384,12 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  String calculateTotal() {
-    double total = 0;
-    for (var item in cartItems) {
-      final product = item['itemId'];
-      total += (product['price'] * item['quantity']);
-    }
-    return total.toStringAsFixed(2);
-  }
+  // String calculateTotal() {
+  //   double total = 0;
+  //   for (var item in cartItems) {
+  //     final product = item['itemId'];
+  //     total += (product['price'] * item['quantity']);
+  //   }
+  //   return total.toStringAsFixed(2);
+  // }
 }

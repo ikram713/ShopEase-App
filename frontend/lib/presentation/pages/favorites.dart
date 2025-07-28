@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'package:ecommerce_app/data/services/favorites_service.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'details.dart';
+
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -19,48 +21,22 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   void initState() {
     super.initState();
-    fetchFavorites();
+    _fetchFavorites();
   }
 
-  Future<void> fetchFavorites() async {
+ Future<void> _fetchFavorites() async {
     setState(() {
       isLoading = true;
       hasError = false;
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final userId = prefs.getString('userId');
-      
-      if (userId == null) {
-        setState(() {
-          isLoading = false;
-          hasError = true;
-        });
-        return;
-      }
-
-      final response = await http.post(
-        Uri.parse('http://10.44.197.181:5000/api/get-likes'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'userId': userId}),
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          favorites = data['favorites'] ?? [];
-          isLoading = false;
-        });
-      } else {
-        setState(() {
-          isLoading = false;
-          hasError = true;
-        });
-      }
-    } catch (e) {
+      favorites = await FavoritesService().fetchFavorites();
+      setState(() => isLoading = false);
+    } catch (_) {
       setState(() {
         isLoading = false;
+
         hasError = true;
       });
     }
@@ -208,7 +184,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: fetchFavorites,
+                        onPressed: _fetchFavorites,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFD2A210),
                           foregroundColor: Colors.white,
@@ -251,7 +227,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
                       ),
                     )
                   : RefreshIndicator(
-                      onRefresh: fetchFavorites,
+                      onRefresh: _fetchFavorites,
                       color: const Color(0xFFD2A210),
                       child: GridView.builder(
                         padding: const EdgeInsets.all(12),

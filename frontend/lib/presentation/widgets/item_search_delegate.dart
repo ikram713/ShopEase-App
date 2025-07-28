@@ -5,7 +5,7 @@ import '../pages/details.dart';
 
 class ItemSearchDelegate extends SearchDelegate {
   Future<List<dynamic>> searchItems(String query) async {
-    final url = Uri.parse('http://10.44.197.181:5000/search?query=${Uri.encodeComponent(query)}');
+    final url = Uri.parse('http://10.93.89.181:5000/search?query=${Uri.encodeComponent(query)}');
     print("🔍 Searching: $url");
 
     try {
